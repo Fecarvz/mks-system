@@ -1,12 +1,30 @@
 import styled from 'styled-components'
 
+export const Shimmer = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 1024px;
+  z-index: 1;
+  background-image: linear-gradient(to right, #f2f2f2 4%, #e6e6e6 25%, #f2f2f2 36%);
+  background-size: 800px 100%;
+  animation: shimmer 1s linear infinite;
+
+  @keyframes shimmer {
+  0% {
+    background-position: -500px 0;
+  }
+  100% {
+    background-position: 500px 0;
+  }
+`
+
+
 export const Container = styled.div`
   display: flex;
   padding: 10%;
   flex-wrap: wrap;
   background: #e5e5e5;
   height: 990px;
-
   >div{
     display: flex;
     height: 300px;

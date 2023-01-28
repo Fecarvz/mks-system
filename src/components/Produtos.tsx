@@ -2,8 +2,10 @@ import {TiShoppingBag} from 'react-icons/ti'
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+
+
 import { Product } from './types';
-import { Container } from './produtos_style'
+import { Container, Shimmer } from './produtos_style'
 
 import imagem0 from '../img/imagem1.png'
 import imagem1 from '../img/imagem2.png'
@@ -22,42 +24,44 @@ interface Response {
 }
 
 const getProducts = async (): Promise<Response> => {
-    try {
-        const response = await axios.get<Response>('https://mks-challenge-api-frontend.herokuapp.com/api/v1/products', {
-            params: {
-                page: 1,
-                rows: 10,
-                sortBy: 'price',
-                orderBy: 'ASC'
-            }
-        });
-        return response.data;
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
+  try {
+      const response = await axios.get<Response>('https://mks-challenge-api-frontend.herokuapp.com/api/v1/products', {
+          params: {
+              page: 1,
+              rows: 10,
+              sortBy: 'price',
+              orderBy: 'ASC'
+          }
+      });
+      return response.data;
+  } catch (error) {
+      console.error(error);
+      throw error;
+  }
 };
 
 
 
 function addCart(item: Product) {
-  let cart: Product[] = JSON.parse(localStorage.getItem('cart') || "[]")
+let cart: Product[] = JSON.parse(localStorage.getItem('cart') || "[]")
 
-  // verifica se o item já existe no carrinho
-  const existingItem = cart.find(i => i.name === item.name);
+// verifica se o item já existe no carrinho
+const existingItem = cart.find(i => i.name === item.name);
 
-  // se o item não existe no carrinho, adiciona ele
-  if (!existingItem) {
-    alert(`${item.name} foi adicionado ao carrinho!`)
-    cart.push(item);
-    localStorage.setItem('cart', JSON.stringify(cart));
-  }
+// se o item não existe no carrinho, adiciona ele
+if (!existingItem) {
+  alert(`${item.name} foi adicionado ao carrinho!`)
+  cart.push(item);
+  localStorage.setItem('cart', JSON.stringify(cart));
+}
 }
 
 
 
 export  const Produtos = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     async function fetchData() {
@@ -71,6 +75,9 @@ export  const Produtos = () => {
           }
         });
         setProducts(response.data.products);
+        setTimeout(() => {
+          setLoading(false);
+        }, 1000);
       } catch (error) {
         console.error(error);
         throw error;
@@ -80,9 +87,13 @@ export  const Produtos = () => {
     fetchData();
   }, []);
 
-
   return (
-    <Container>
+    <>
+    {loading ? (
+      <Shimmer>
+      </Shimmer>
+      ) : (
+        <Container>
       {products.map((product, index) => (
         <div key={index}>
           <div>
@@ -92,12 +103,11 @@ export  const Produtos = () => {
             <h2>{product.name}</h2>
             <span>R${Math.floor(product.price)}</span>
           </section>
-          <p>{product.description}</p>
-          <button onClick={() => addCart(product)}><TiShoppingBag/>Comprar</button>
-        </div>
-      ))}
-    </Container>
-  );
-}
-
-
+            <p>{product.description}</p>
+            <button onClick={() => addCart(product)}><TiShoppingBag/>Comprar</button>
+          </div>
+            ))}
+        </Container>
+)}
+</>
+)}
